@@ -1,3 +1,4 @@
+Start-Transcript -Path c:\log\myscript.log
 # Set main path
 $fromFolderPath = "D:\Testdata\h2n"
 $ToFolderPath = "D:\Testdata\Output"
@@ -41,13 +42,14 @@ $destination = "$fromFolderPath\$($temporary_empty[0])"
 
 # Looking for folders which should be archivized and sent
 $folders_list = @(Get-ChildItem -Path $fromFolderPath -Name -Filter '*_*_*')
+$dates = $null
 foreach ($foldername in $folders_list)
 {
   $dates += @([Datetime]::ParseExact($foldername, 'yyyy_MM_dd', $null))  
 }
 for($i=1; $i -lt $dates.Length; $i++)
 {  
-  if (($dates[$i] - $dates[$i-1]).ToString()[0].ToString() -gt 1)
+  if (($dates[$i] - $dates[$i-1]).ToString().Split(".")[0] -gt 1)
     {
       $first_to_move = $folders_list[$i]    
     }  
@@ -84,3 +86,4 @@ if ($temporary_empty.Count -in 1, 3) {
 # Clearing $dates and $first_to_move variable
 $dates = $null
 $first_to_move = $null
+Stop-Transcript
