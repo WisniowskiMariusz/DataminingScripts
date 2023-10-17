@@ -2,6 +2,7 @@ Start-Transcript -Path c:\log\myscript.log
 # Set main path
 $fromFolderPath = "D:\Testdata\h2n"
 $ToFolderPath = "D:\Testdata\Output"
+$PcName = "Ryzen2700x"
 
 Function Test-DirectoryIsEmpty {
   param (
@@ -66,12 +67,12 @@ foreach ($folder in $folders_to_move) {
   }
 
 # Generate RAR archive with folders which should be archivized and sent
-$argList = @("a",  "-r", "-ep1", "$destination\$($temporary_empty[0]).rar" ,"$destination\*.*")
+$argList = @("a",  "-r", "-ep1", "$destination\$($temporary_empty[0])@$PcName.rar" ,"$destination\*.*")
 Start-Process -FilePath "C:\Program Files\Winrar\winrar.exe" -ArgumentList $argList -NoNewWindow -Wait
 
 if ($temporary_empty.Count -in 1, 3) {
   # Looking for new and old temporary folders
-  $temporary_new = $temporary_all.Where({(Test-Path -Path "$fromFolderPath\$_\$_.rar") -or ($_ -in $temporary_empty)})
+  $temporary_new = $temporary_all.Where({(Test-Path -Path "$fromFolderPath\$_\$_@$PcName.rar") -or ($_ -in $temporary_empty)})
   $temporary_old = $temporary_all.Where({$_ -notin $temporary_new})
   # Moving and merging folders from temporary folders with was sent last time with those from main path
   foreach ($folder in $temporary_old) {
@@ -79,7 +80,7 @@ if ($temporary_empty.Count -in 1, 3) {
   }
   # Moving RAR archives to destiantion
   foreach ($folder in $temporary_new) {
-    Move-Item -LiteralPath "$fromFolderPath\$folder\$folder.rar" -Destination $ToFolderPath
+    Move-Item -LiteralPath "$fromFolderPath\$folder\$folder@$PcName.rar" -Destination $ToFolderPath
   }
 }
 
