@@ -31,11 +31,6 @@ foreach ($folder in $folders_to_move)
 }
 $dates = $null
 
-#Generate RAR archive
-$argList = @("a",  "-r", "-ep1", "$destination\$($tymczasowe_empty[0]).rar" ,"$destination\*.*")
-
-#Start-Process -FilePath "C:\Program Files\Winrar\winrar.exe" -ArgumentList $argList -NoNewWindow -Wait
-
 foreach ($folder in $tymczasowe_notempty)
 {
     "-------"
