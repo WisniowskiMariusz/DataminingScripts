@@ -65,23 +65,28 @@ $folders_to_move = $folders_list.Where({$_ -eq $first_to_move}, 'SkipUntil')
 foreach ($folder in $folders_to_move) {    
     Move-Item -LiteralPath "$fromFolderPath\$folder" -Destination $destination | Out-Null
   }
+Write-Host $(Get-Date) $folders_to_move.Count "new folders has been moved to $destination"
 
 # Generate RAR archive with folders which should be archivized and sent
 $argList = @("a",  "-r", "-ep1", "$destination\$($temporary_empty[0])@$PcName.rar" ,"$destination\*.*")
 Start-Process -FilePath "C:\Program Files\Winrar\winrar.exe" -ArgumentList $argList -NoNewWindow -Wait
+Write-Host $(Get-Date) $folders_to_move.Count "new folders has been archivzed to $destination\$($temporary_empty[0])@$PcName.rar file."
 
 if ($temporary_empty.Count -in 1, 3) {
   # Looking for new and old temporary folders
-  $temporary_new = $temporary_all.Where({(Test-Path -Path "$fromFolderPath\$_\$_@$PcName.rar") -or ($_ -in $temporary_empty)})
-  $temporary_old = $temporary_all.Where({$_ -notin $temporary_new})
+  $temporary_new = $temporary_all.Where({Test-Path -Path "$fromFolderPath\$_\$_@$PcName.rar"})
+  $temporary_old = $temporary_all.Where({($_ -notin $temporary_new) -and (-Not (Test-DirectoryIsEmpty -Path "$fromFolderPath\$_"))})
   # Moving and merging folders from temporary folders with was sent last time with those from main path
   foreach ($folder in $temporary_old) {
     Merge -Source "$fromFolderPath\$folder" -Destination $fromFolderPath
   }
+  Write-Host $(Get-Date) $temporary_old.Count "old folders has been merged back with $fromFolderPath"
+
   # Moving RAR archives to destiantion
   foreach ($folder in $temporary_new) {
     Move-Item -LiteralPath "$fromFolderPath\$folder\$folder@$PcName.rar" -Destination $ToFolderPath
   }
+  Write-Host $(Get-Date) $temporary_new.Count "rar files has been moved to destination folder:  $ToFolderPath"
 }
 
 # Clearing $dates and $first_to_move variable
