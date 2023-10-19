@@ -7,12 +7,16 @@ function WriteLog
 Param ([string]$LogString)
 $Stamp = (Get-Date).toString($DateFormat)
 $LogMessage = "$Stamp $LogString"
-Write-Host $LogMessage
-Add-content $logfile -value $LogMessage
+Switch ($logoption){
+    {$_ -in ("Both", "Console")} {Write-Host $LogMessage}
+    {$_ -in ("Both", "File")}{Add-content $logfile -value $LogMessage}
+    }
 }
 
+WriteLog("******************************************************************************************")
 WriteLog($DateFormat) 
 WriteLog($logfile) 
 WriteLog($FromFolderPath) 
 WriteLog($ToFolderPath) 
 WriteLog($PcName) 
+WriteLog("******************************************************************************************")
