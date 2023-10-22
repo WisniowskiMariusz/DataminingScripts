@@ -1,14 +1,20 @@
 # Get environment from config file
-Foreach ($i in $(Get-Content archivizer.conf)){
-  Set-Variable -Name $i.split("=")[0] -Value $i.split("=",2)[1]
+$configfile = (Split-Path $MyInvocation.MyCommand.Path -Parent) + '\archivizer.conf'
+
+Foreach ($i in $(Get-Content $configfile -Encoding "UTF8")){
+    Set-Variable -Name $i.split("=")[0] -Value $i.split("=",2)[1]
 }
 
-function WriteLog {
+Start-Transcript -Path $transcriptfile -Append
+function WriteLog
+{
 Param ([string]$LogString)
 $Stamp = (Get-Date).toString($DateFormat)
 $LogMessage = "$Stamp $LogString"
-Write-Host $LogMessage
-Add-content $logfile -value $LogMessage
+Switch ($logoption){
+    {$_ -in ("Both", "Console")} {Write-Host $LogMessage}
+    {$_ -in ("Both", "File")}{Add-content $logfile -value $LogMessage}
+    }
 }
 Function Test-DirectoryIsEmpty {
   param ([Parameter(Mandatory=$true)][string]$Path)
@@ -92,6 +98,8 @@ if ($temporary_empty.Count -in 1, 3) {
 
   # Moving RAR archives to destiantion
   foreach ($folder in $temporary_new) {
+    WriteLog(Get-ChildItem -Path "$FromFolderPath\$folder")
+    Writelog("From: "+"$FromFolderPath\$folder\$folder@$PcName.rar")
     Move-Item -LiteralPath "$FromFolderPath\$folder\$folder@$PcName.rar" -Destination $ToFolderPath
   }
   WriteLog([string]($temporary_new.Count) + " rar files has been moved to destination folder:  $ToFolderPath")
@@ -103,3 +111,5 @@ $first_to_move = $null
 
 WriteLog("Script completed.")
 WriteLog("******************************************************************************************")
+
+Stop-Transcript
