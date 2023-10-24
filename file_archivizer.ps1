@@ -97,10 +97,9 @@ if ($temporary_empty.Count -in 1, 3) {
   WriteLog([string]($temporary_old.Count) + " old folders has been merged back with $FromFolderPath")
 
   # Moving RAR archives to destiantion
-  foreach ($folder in $temporary_new) {
-    WriteLog(Get-ChildItem -Path "$FromFolderPath\$folder")
-    Writelog("From: "+"$FromFolderPath\$folder\$folder@$PcName.rar")
+  foreach ($folder in $temporary_new) {    
     Move-Item -LiteralPath "$FromFolderPath\$folder\$folder@$PcName.rar" -Destination $ToFolderPath
+    Writelog("$FromFolderPath\$folder\$folder@$PcName.rar"+" has been moved to :"+$ToFolderPath)
   }
   WriteLog([string]($temporary_new.Count) + " rar files has been moved to destination folder:  $ToFolderPath")
 }
