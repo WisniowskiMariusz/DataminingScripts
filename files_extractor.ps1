@@ -60,8 +60,11 @@ Function ExtractAndArchive {
     [Parameter(Mandatory=$true)][string]$Destination,
     [Parameter(Mandatory=$true)][string]$Archive
   ) 
-ExtractAndLog -Source $Source -Destination $Destination
-MoveAndLog -Source $Source -Destination $Archive
+ExtractAndLog -Source "$Source\*.rar" -Destination $Destination
+foreach ($file in (Get-ChildItem -Path $Source -Name))
+{
+  MoveAndLog -Source "$Source\$file" -Destination $Archive
+}
 }
 
 WriteLog("******************************************************************************************")
@@ -81,10 +84,7 @@ $to_extract = (Get-ChildItem -Path $extract_source_path -Name).Where({$_ -match 
 foreach ($folder in $to_extract)
 {
   CreateIfNotExist("$extract_source_path/Archive/$folder")
-  $files_to_extract = Get-ChildItem -Path "$extract_source_path/$folder"
-  foreach ($file in $files_to_extract){    
-    ExtractAndArchive -Source $file.FullName -Destination "$Destination" -Archive "$extract_output_basepath/Archive/$folder"
-  }
+  ExtractAndArchive -Source "$extract_source_path\$folder" -Destination "$Destination" -Archive "$extract_output_basepath/Archive/$folder"  
   if (-not ($folder -eq ($to_extract | Select-Object -Last 1))){    
     Remove-Item "$extract_source_path/$folder"
   }
@@ -92,6 +92,7 @@ foreach ($folder in $to_extract)
 
 WriteLog("Script completed.")
 WriteLog("******************************************************************************************")
+Pause
 
 Stop-Transcript
 
