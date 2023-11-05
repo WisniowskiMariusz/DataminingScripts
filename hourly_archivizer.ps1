@@ -102,6 +102,15 @@ Function MergeBackAndLog {
   Get-ChildItem -Path "$FromFolderPath\Temporary\$Yesterday" | ForEach-Object {
     Merge -Source "$FromFolderPath\Temporary\$Yesterday\$_\$Yesterday" -Destination "$FromFolderPath\$Yesterday"
     WriteLog("$FromFolderPath\Temporary\$Yesterday\$_\$Yesterday has been successfully merged into $FromFolderPath.")
+    if (Test-DirectoryIsEmpty ("$FromFolderPath\Temporary\$Yesterday\$_\$Yesterday")){
+      Remove-Item ("$FromFolderPath\Temporary\$Yesterday\$_\$Yesterday")
+      if (Test-DirectoryIsEmpty ("$FromFolderPath\Temporary\$Yesterday\$_")){
+        Remove-Item ("$FromFolderPath\Temporary\$Yesterday\$_")
+      }
+    }
+  }
+  if (Test-DirectoryIsEmpty ("$FromFolderPath\Temporary\$Yesterday")){
+    Remove-Item ("$FromFolderPath\Temporary\$Yesterday")
   }
 }
 
