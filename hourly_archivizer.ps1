@@ -18,7 +18,13 @@ Switch ($logoption){
 }
 Function Test-DirectoryIsEmpty {
   param ([Parameter(Mandatory=$true)][string]$Path)
-  Return(-Not(Test-Path -Path "$Path\*"))
+  if (Test-Path -Path $Path){
+    Return(-Not(Test-Path -Path "$Path\*"))
+  }
+  else{
+    WriteLog("$Path does not exist so cannot check if it is empty.")
+    Return($false)
+  }
 }
 
 Function Merge {
